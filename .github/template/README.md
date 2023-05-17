@@ -9,8 +9,8 @@ LGTM Has to be set up manually after template is created:
 [![Language grade: C++](https://img.shields.io/lgtm/grade/cpp/github/%%myorg%%/%%myproject%%)](https://lgtm.com/projects/g/%%myorg%%/%%myproject%%/context:cpp)
 
 ## About %%myproject%%
-%%description%%
 
+%%description%%
 
 ## More Details
 

@@ -1,16 +1,17 @@
 ## Dependencies
 
 Note about install commands:
+
 - for Windows, we use [choco](https://chocolatey.org/install).
 - for MacOS, we use [brew](https://brew.sh/).
 - In case of an error in cmake, make sure that the dependencies are on the PATH.
-
 
 ### Too Long, Didn't Install
 
 This is a really long list of dependencies, and it's easy to mess up. That's why:
 
 #### Docker
+
 We have a Docker image that's already set up for you. See the [Docker instructions](#docker-instructions).
 
 #### Setup-cpp
@@ -20,6 +21,7 @@ We have [setup-cpp](https://github.com/aminya/setup-cpp) that is a cross-platfor
 Please check [the setup-cpp documentation](https://github.com/aminya/setup-cpp) for more information.
 
 For example, on Windows, you can run the following to install llvm, cmake, ninja, ccache, and cppcheck.
+
 ```ps1
 # windows example (open shell as admin)
 curl -LJO "https://github.com/aminya/setup-cpp/releases/download/v0.5.7/setup_cpp_windows.exe"
@@ -29,6 +31,7 @@ RefreshEnv.cmd # reload the environment
 ```
 
 ### Necessary Dependencies
+
 1. A C++ compiler that supports C++17.
 See [cppreference.com](https://en.cppreference.com/w/cpp/compiler_support)
 to see which features are supported by each compiler.
@@ -122,6 +125,7 @@ The following compilers should work:
 	</details>
 
 ### Optional Dependencies
+
 #### C++ Tools
   * [Doxygen](http://doxygen.nl/)
 	<details>
@@ -181,7 +185,6 @@ The following compilers should work:
 			brew install cppcheck
 
 	</details>
-
 
   * [include-what-you-use](https://include-what-you-use.org/)
 	<details>

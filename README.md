@@ -9,7 +9,6 @@
 
 **NOTE** This is undergoing a major overhaul on a new branch currently.
 
-
 This is a C++ Best Practices GitHub template for getting up and running with C++ quickly.
 
 By default (collectively known as `ENABLE_DEVELOPER_MODE`)
@@ -30,20 +29,19 @@ It requires
  * cmake
  * a compiler
 
-
 This project gets you started with a simple example of using FTXUI, which happens to also be a game.
-
 
 ## Getting Started
 
 ### Use the Github template
+
 First, click the green `Use this template` button near the top of this page.
 This will take you to Github's ['Generate Repository'](https://github.com/cpp-best-practices/cmake_template/generate) page.
 Fill in a repository name and short description, and click 'Create repository from template'.
 This will allow you to create a new repository in your Github account,
 prepopulated with the contents of this project.
 
-After creating the project please wait until the cleanup workflow has finished 
+After creating the project please wait until the cleanup workflow has finished
 setting up your project and commited the changes.
 
 Now you can clone the project locally and get to work!
@@ -64,5 +62,3 @@ See [Catch2 tutorial](https://github.com/catchorg/Catch2/blob/master/docs/tutori
 ## Fuzz testing
 
 See [libFuzzer Tutorial](https://github.com/google/fuzzing/blob/master/tutorial/libFuzzerTutorial.md)
-
-
