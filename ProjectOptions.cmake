@@ -3,7 +3,6 @@ include(cmake/LibFuzzer.cmake)
 include(CMakeDependentOption)
 include(CheckCXXCompilerFlag)
 
-
 macro(myproject_supports_sanitizers)
   if((CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*" OR CMAKE_CXX_COMPILER_ID MATCHES ".*GNU.*") AND NOT WIN32)
     set(SUPPORTS_UBSAN ON)
@@ -22,11 +21,9 @@ macro(myproject_setup_options)
   option(myproject_ENABLE_HARDENING "Enable hardening" ON)
   option(myproject_ENABLE_COVERAGE "Enable coverage reporting" OFF)
   cmake_dependent_option(
-    myproject_ENABLE_GLOBAL_HARDENING
-    "Attempt to push hardening options to built dependencies"
-    ON
-    myproject_ENABLE_HARDENING
-    OFF)
+    myproject_ENABLE_GLOBAL_HARDENING "Attempt to push hardening options to built dependencies" ON
+    myproject_ENABLE_HARDENING OFF
+  )
 
   myproject_supports_sanitizers()
 
@@ -75,11 +72,16 @@ macro(myproject_setup_options)
       myproject_ENABLE_CPPCHECK
       myproject_ENABLE_COVERAGE
       myproject_ENABLE_PCH
-      myproject_ENABLE_CACHE)
+      myproject_ENABLE_CACHE
+    )
   endif()
 
   myproject_check_libfuzzer_support(LIBFUZZER_SUPPORTED)
-  if(LIBFUZZER_SUPPORTED AND (myproject_ENABLE_SANITIZER_ADDRESS OR myproject_ENABLE_SANITIZER_THREAD OR myproject_ENABLE_SANITIZER_UNDEFINED))
+  if(LIBFUZZER_SUPPORTED
+     AND (myproject_ENABLE_SANITIZER_ADDRESS
+          OR myproject_ENABLE_SANITIZER_THREAD
+          OR myproject_ENABLE_SANITIZER_UNDEFINED)
+  )
     set(DEFAULT_FUZZER ON)
   else()
     set(DEFAULT_FUZZER OFF)
@@ -99,11 +101,12 @@ macro(myproject_global_options)
 
   if(myproject_ENABLE_HARDENING AND myproject_ENABLE_GLOBAL_HARDENING)
     include(cmake/Hardening.cmake)
-    if(NOT SUPPORTS_UBSAN 
+    if(NOT SUPPORTS_UBSAN
        OR myproject_ENABLE_SANITIZER_UNDEFINED
        OR myproject_ENABLE_SANITIZER_ADDRESS
        OR myproject_ENABLE_SANITIZER_THREAD
-       OR myproject_ENABLE_SANITIZER_LEAK)
+       OR myproject_ENABLE_SANITIZER_LEAK
+    )
       set(ENABLE_UBSAN_MINIMAL_RUNTIME FALSE)
     else()
       set(ENABLE_UBSAN_MINIMAL_RUNTIME TRUE)
@@ -122,13 +125,7 @@ macro(myproject_local_options)
   add_library(myproject_options INTERFACE)
 
   include(cmake/CompilerWarnings.cmake)
-  myproject_set_project_warnings(
-    myproject_warnings
-    ${myproject_WARNINGS_AS_ERRORS}
-    ""
-    ""
-    ""
-    "")
+  myproject_set_project_warnings(myproject_warnings ${myproject_WARNINGS_AS_ERRORS} "" "" "" "")
 
   if(myproject_ENABLE_USER_LINKER)
     include(cmake/Linker.cmake)
@@ -137,22 +134,14 @@ macro(myproject_local_options)
 
   include(cmake/Sanitizers.cmake)
   myproject_enable_sanitizers(
-    myproject_options
-    ${myproject_ENABLE_SANITIZER_ADDRESS}
-    ${myproject_ENABLE_SANITIZER_LEAK}
-    ${myproject_ENABLE_SANITIZER_UNDEFINED}
-    ${myproject_ENABLE_SANITIZER_THREAD}
-    ${myproject_ENABLE_SANITIZER_MEMORY})
+    myproject_options ${myproject_ENABLE_SANITIZER_ADDRESS} ${myproject_ENABLE_SANITIZER_LEAK}
+    ${myproject_ENABLE_SANITIZER_UNDEFINED} ${myproject_ENABLE_SANITIZER_THREAD} ${myproject_ENABLE_SANITIZER_MEMORY}
+  )
 
   set_target_properties(myproject_options PROPERTIES UNITY_BUILD ${myproject_ENABLE_UNITY_BUILD})
 
   if(myproject_ENABLE_PCH)
-    target_precompile_headers(
-      myproject_options
-      INTERFACE
-      <vector>
-      <string>
-      <utility>)
+    target_precompile_headers(myproject_options INTERFACE <vector> <string> <utility>)
   endif()
 
   if(myproject_ENABLE_CACHE)
@@ -178,18 +167,19 @@ macro(myproject_local_options)
   if(myproject_WARNINGS_AS_ERRORS)
     check_cxx_compiler_flag("-Wl,--fatal-warnings" LINKER_FATAL_WARNINGS)
     if(LINKER_FATAL_WARNINGS)
-      # This is not working consistently, so disabling for now
-      # target_link_options(myproject_options INTERFACE -Wl,--fatal-warnings)
+      # This is not working consistently, so disabling for now target_link_options(myproject_options INTERFACE
+      # -Wl,--fatal-warnings)
     endif()
   endif()
 
   if(myproject_ENABLE_HARDENING AND NOT myproject_ENABLE_GLOBAL_HARDENING)
     include(cmake/Hardening.cmake)
-    if(NOT SUPPORTS_UBSAN 
+    if(NOT SUPPORTS_UBSAN
        OR myproject_ENABLE_SANITIZER_UNDEFINED
        OR myproject_ENABLE_SANITIZER_ADDRESS
        OR myproject_ENABLE_SANITIZER_THREAD
-       OR myproject_ENABLE_SANITIZER_LEAK)
+       OR myproject_ENABLE_SANITIZER_LEAK
+    )
       set(ENABLE_UBSAN_MINIMAL_RUNTIME FALSE)
     else()
       set(ENABLE_UBSAN_MINIMAL_RUNTIME TRUE)

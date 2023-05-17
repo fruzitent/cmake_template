@@ -1,10 +1,6 @@
 include(CheckCXXCompilerFlag)
 
-macro(
-  myproject_enable_hardening
-  target
-  global
-  ubsan_minimal_runtime)
+macro(myproject_enable_hardening target global ubsan_minimal_runtime)
 
   message(STATUS "** Enabling Hardening (Target ${target}) **")
 
@@ -20,15 +16,11 @@ macro(
     set(NEW_COMPILE_OPTIONS "${NEW_COMPILE_OPTIONS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3")
     message(STATUS "*** g++/clang _FORTIFY_SOURCE=3 enabled")
 
-    #    check_cxx_compiler_flag(-fpie PIE)
-    #if(PIE)
-    #  set(NEW_COMPILE_OPTIONS ${NEW_COMPILE_OPTIONS} -fpie)
-    #  set(NEW_LINK_OPTIONS ${NEW_LINK_OPTIONS} -pie)
+    # check_cxx_compiler_flag(-fpie PIE) if(PIE) set(NEW_COMPILE_OPTIONS ${NEW_COMPILE_OPTIONS} -fpie)
+    # set(NEW_LINK_OPTIONS ${NEW_LINK_OPTIONS} -pie)
     #
-    #  message(STATUS "*** g++/clang PIE mode enabled")
-    #else()
-    #  message(STATUS "*** g++/clang PIE mode NOT enabled (not supported)")
-    #endif()
+    # message(STATUS "*** g++/clang PIE mode enabled") else() message(STATUS "*** g++/clang PIE mode NOT enabled (not
+    # supported)") endif()
 
     check_cxx_compiler_flag(-fstack-protector-strong STACK_PROTECTOR)
     if(STACK_PROTECTOR)
@@ -60,8 +52,9 @@ macro(
   endif()
 
   if(${ubsan_minimal_runtime})
-    check_cxx_compiler_flag("-fsanitize=undefined -fno-sanitize-recover=undefined -fsanitize-minimal-runtime"
-                            MINIMAL_RUNTIME)
+    check_cxx_compiler_flag(
+      "-fsanitize=undefined -fno-sanitize-recover=undefined -fsanitize-minimal-runtime" MINIMAL_RUNTIME
+    )
     if(MINIMAL_RUNTIME)
       set(NEW_COMPILE_OPTIONS "${NEW_COMPILE_OPTIONS} -fsanitize=undefined -fsanitize-minimal-runtime")
       set(NEW_LINK_OPTIONS "${NEW_LINK_OPTIONS} -fsanitize=undefined -fsanitize-minimal-runtime")

@@ -9,8 +9,8 @@ macro(myproject_enable_cppcheck WARNINGS_AS_ERRORS CPPCHECK_OPTIONS)
     endif()
 
     if("${CPPCHECK_OPTIONS}" STREQUAL "")
-      # Enable all warnings that are actionable by the user of this toolset
-      # style should enable the other 3, but we'll be explicit just in case
+      # Enable all warnings that are actionable by the user of this toolset style should enable the other 3, but we'll
+      # be explicit just in case
       set(CMAKE_CXX_CPPCHECK
           ${CPPCHECK}
           --template=${CPPCHECK_TEMPLATE}
@@ -26,16 +26,14 @@ macro(myproject_enable_cppcheck WARNINGS_AS_ERRORS CPPCHECK_OPTIONS)
           # ignores code that cppcheck thinks is invalid C++
           --suppress=syntaxError
           --suppress=preprocessorErrorDirective
-          --inconclusive)
+          --inconclusive
+      )
     else()
       # if the user provides a CPPCHECK_OPTIONS with a template specified, it will override this template
       set(CMAKE_CXX_CPPCHECK ${CPPCHECK} --template=${CPPCHECK_TEMPLATE} ${CPPCHECK_OPTIONS})
     endif()
 
-    if(NOT
-       "${CMAKE_CXX_STANDARD}"
-       STREQUAL
-       "")
+    if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "")
       set(CMAKE_CXX_CPPCHECK ${CMAKE_CXX_CPPCHECK} --std=c++${CMAKE_CXX_STANDARD})
     endif()
     if(${WARNINGS_AS_ERRORS})
@@ -50,10 +48,7 @@ macro(myproject_enable_clang_tidy target WARNINGS_AS_ERRORS)
 
   find_program(CLANGTIDY clang-tidy)
   if(CLANGTIDY)
-    if(NOT
-       CMAKE_CXX_COMPILER_ID
-       MATCHES
-       ".*Clang")
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
 
       get_target_property(TARGET_PCH ${target} INTERFACE_PRECOMPILE_HEADERS)
 
@@ -64,22 +59,18 @@ macro(myproject_enable_clang_tidy target WARNINGS_AS_ERRORS)
       if(NOT ("${TARGET_PCH}" STREQUAL "TARGET_PCH-NOTFOUND"))
         message(
           SEND_ERROR
-            "clang-tidy cannot be enabled with non-clang compiler and PCH, clang-tidy fails to handle gcc's PCH file")
+            "clang-tidy cannot be enabled with non-clang compiler and PCH, clang-tidy fails to handle gcc's PCH file"
+        )
       endif()
     endif()
 
     # construct the clang-tidy command line
     set(CLANG_TIDY_OPTIONS
-        ${CLANGTIDY}
-        -extra-arg=-Wno-unknown-warning-option
-        -extra-arg=-Wno-ignored-optimization-argument
-        -extra-arg=-Wno-unused-command-line-argument
-        -p)
+        ${CLANGTIDY} -extra-arg=-Wno-unknown-warning-option -extra-arg=-Wno-ignored-optimization-argument
+        -extra-arg=-Wno-unused-command-line-argument -p
+    )
     # set standard
-    if(NOT
-       "${CMAKE_CXX_STANDARD}"
-       STREQUAL
-       "")
+    if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "")
       if("${CLANG_TIDY_OPTIONS_DRIVER_MODE}" STREQUAL "cl")
         set(CLANG_TIDY_OPTIONS ${CLANG_TIDY_OPTIONS} -extra-arg=/std:c++${CMAKE_CXX_STANDARD})
       else()
