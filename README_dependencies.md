@@ -1,192 +1,201 @@
-## Dependencies
+# Dependencies
 
 Note about install commands:
-- for Windows, we use [choco](https://chocolatey.org/install).
-- for MacOS, we use [brew](https://brew.sh/).
-- In case of an error in cmake, make sure that the dependencies are on the PATH.
 
+- for MacOS, we use [brew](https://brew.sh/)
+- for Windows, we use [choco](https://chocolatey.org/install)
+- In case of an error in cmake, make sure that the dependencies are on the PATH
 
-### Too Long, Didn't Install
+## Too Long, Didn't Install
 
 This is a really long list of dependencies, and it's easy to mess up. That's why:
 
-#### Docker
-We have a Docker image that's already set up for you. See the [Docker instructions](#docker-instructions).
+- Docker
 
-#### Setup-cpp
+  We have a Docker image that's already set up for you. See the [Docker instructions](#docker-instructions).
 
-We have [setup-cpp](https://github.com/aminya/setup-cpp) that is a cross-platform tool to install all the compilers and dependencies on the system.
+- Setup-cpp
 
-Please check [the setup-cpp documentation](https://github.com/aminya/setup-cpp) for more information.
+  We have [setup-cpp](https://github.com/aminya/setup-cpp) that is a cross-platform tool to install all the compilers and dependencies on the system.
 
-For example, on Windows, you can run the following to install llvm, cmake, ninja, ccache, and cppcheck.
-```ps1
-# windows example (open shell as admin)
-curl -LJO "https://github.com/aminya/setup-cpp/releases/download/v0.5.7/setup_cpp_windows.exe"
-./setup_cpp_windows --compiler llvm --cmake true --ninja true --ccache true --cppcheck true
+  Please check [the setup-cpp documentation](https://github.com/aminya/setup-cpp) for more information.
 
-RefreshEnv.cmd # reload the environment
-```
+  For example, on Windows, you can run the following to install llvm, cmake, ninja, ccache, and cppcheck.
 
-### Necessary Dependencies
-1. A C++ compiler that supports C++17.
-See [cppreference.com](https://en.cppreference.com/w/cpp/compiler_support)
-to see which features are supported by each compiler.
-The following compilers should work:
+  ```powershell
+  curl -O "https://github.com/aminya/setup-cpp/releases/latest/download/setup-cpp-x64-windows.exe"
+  ./setup_cpp_windows --ccache true --cmake true --compiler llvm --cppcheck true --ninja true
+  RefreshEnv.cmd
+  ```
 
-  * [gcc 7+](https://gcc.gnu.org/)
-	<details>
-	<summary>Install command</summary>
+## Necessary Dependencies
 
-	- Debian/Ubuntu:
+- A C++ compiler that supports C++17
+  See [cppreference.com](https://en.cppreference.com/w/cpp/compiler_support)
+  to see which features are supported by each compiler.
+  The following compilers should work:
 
-			sudo apt install build-essential
+  - [Clang 6+](https://clang.llvm.org)
 
-	- Windows:
+    - MacOS
 
-			choco install mingw -y
+      ```shell
+      brew install llvm
+      ```
 
-	- MacOS:
+    - Ubuntu
 
-			brew install gcc
-	</details>
+      ```shell
+      bash -c "$(wget -O - <https://apt.llvm.org/llvm.sh>)"
+      ```
 
-  * [clang 6+](https://clang.llvm.org/)
-	<details>
-	<summary>Install command</summary>
+    - Windows
 
-	- Debian/Ubuntu:
+      Visual Studio 2019 ships with LLVM (see the Visual Studio section). However, to install LLVM separately:
 
-			bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+      ```powershell
+      choco install llvm -y
+      ```
 
-	- Windows:
+      llvm-utils for using external LLVM with Visual Studio generator:
 
-		Visual Studio 2019 ships with LLVM (see the Visual Studio section). However, to install LLVM separately:
+      ```powershell
+      git clone <https://github.com/zufuliu/llvm-utils.git>
+      cd llvm-utils/VS2017
+      .\install.bat
+      ```
 
-			choco install llvm -y
+  - [GCC 7+](https://gcc.gnu.org/)
 
-		llvm-utils for using external LLVM with Visual Studio generator:
+    - MacOS
 
-			git clone https://github.com/zufuliu/llvm-utils.git
-			cd llvm-utils/VS2017
-			.\install.bat
+      ```shell
+      brew install gcc
+      ```
 
-	- MacOS:
+    - Ubuntu
 
-			brew install llvm
-	</details>
+      ```shell
+      sudo apt install build-essential
+      ```
 
-  * [Visual Studio 2019 or higher](https://visualstudio.microsoft.com/)
-	<details>
-	<summary>Install command + Environment setup</summary>
+    - Windows
 
-	On Windows, you need to install Visual Studio 2019 because of the SDK and libraries that ship with it.
+      ```powershell
+      choco install mingw -y
+      ```
 
-  	Visual Studio IDE - 2019 Community (installs Clang too):
+  - [MSVC 2019+](https://visualstudio.microsoft.com)
 
-  	  	choco install -y visualstudio2019community --package-parameters "add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --passive --locale en-US"
+    On Windows, you need to install Visual Studio 2019 because of the SDK and libraries that ship with it.
 
-	Put MSVC compiler, Clang compiler, and vcvarsall.bat on the path:
+    ```powershell
+    choco install -y visualstudio2019community --package-parameters "add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --passive --locale en-US"
+    ```
 
-			choco install vswhere -y
-			refreshenv
+    Put MSVC compiler, Clang compiler, and vcvarsall.bat on the path:
 
-			# change to x86 for 32bit
-			$clpath = vswhere -products * -latest -prerelease -find **/Hostx64/x64/*
-			$clangpath = vswhere -products * -latest -prerelease -find **/Llvm/bin/*
-			$vcvarsallpath =  vswhere -products * -latest -prerelease -find **/Auxiliary/Build/*
+    ```powershell
+    choco install vswhere -y
+    refreshenv
+    ```
 
-			$path = [System.Environment]::GetEnvironmentVariable("PATH", "User")
-			[Environment]::SetEnvironmentVariable("Path", $path + ";$clpath" + ";$clangpath" + ";$vcvarsallpath", "User")
-			refreshenv
+    Change to x86 for 32bit
 
-	</details>
+    ```powershell
+    $clpath = vswhere -products *-latest -prerelease -find **/Hostx64/x64/*
+    $clangpath = vswhere -products * -latest -prerelease -find **/Llvm/bin/*
+    $vcvarsallpath =  vswhere -products * -latest -prerelease -find **/Auxiliary/Build/*
 
+    $path = [System.Environment]::GetEnvironmentVariable("PATH", "User")
+    refreshenv
+    ```
 
-2. [CMake 3.15+](https://cmake.org/)
-	<details>
-	<summary>Install Command</summary>
+- [Cmake 3.15+](https://cmake.org)
 
-	- Debian/Ubuntu:
+  - MacOS
 
-			sudo apt-get install cmake
+    ```shell
+    brew install cmake
+    ```
 
-	- Windows:
+  - Ubuntu
 
-			choco install cmake -y
+    ```shell
+    sudo apt-get install cmake
+    ```
 
-	- MacOS:
+  - Windows
 
-			brew install cmake
+    ```powershell
+    choco install cmake -y
+    ```
 
-	</details>
+## Optional Dependencies
 
-### Optional Dependencies
-#### C++ Tools
-  * [Doxygen](http://doxygen.nl/)
-	<details>
-	<summary>Install Command</summary>
+- [ccache](https://ccache.dev)
 
-	- Debian/Ubuntu:
+  - MacOS
 
-			sudo apt-get install doxygen
-			sudo apt-get install graphviz
+    ```shell
+    brew install ccache
+    ```
 
-	- Windows:
+  - Ubuntu
 
-			choco install doxygen.install -y
-			choco install graphviz -y
+    ```shell
+    sudo apt-get install ccache
+    ```
 
-	- MacOS:
+  - Windows
 
-			brew install doxygen
-	 		brew install graphviz
+    ```powershell
+    choco install ccache -y
+    ```
 
-	</details>
+- [Cppcheck](http://cppcheck.sourceforge.net)
 
+  - MacOS
 
-  * [ccache](https://ccache.dev/)
-	<details>
-	<summary>Install Command</summary>
+    ```shell
+    brew install cppcheck
+    ```
 
-	- Debian/Ubuntu:
+  - Ubuntu
 
-			sudo apt-get install ccache
+    ```shell
+    sudo apt-get install cppcheck
+    ```
 
-	- Windows:
+  - Windows
 
-			choco install ccache -y
+    ```powershell
+    choco install cppcheck -y
+    ```
 
-	- MacOS:
+- [Doxygen](http://doxygen.nl)
 
-			brew install ccache
+  - MacOS
 
-	</details>
+    ```shell
+    brew install doxygen
+    brew install graphviz
+    ```
 
+  - Ubuntu
 
-  * [Cppcheck](http://cppcheck.sourceforge.net/)
-	<details>
-	<summary>Install Command</summary>
+    ```shell
+    sudo apt-get install doxygen
+    sudo apt-get install graphviz
+    ```
 
-	- Debian/Ubuntu:
+  - Windows
 
-			sudo apt-get install cppcheck
+    ```powershell
+    choco install doxygen.install -y
+    choco install graphviz -y
+    ```
 
-	- Windows:
+- [include-what-you-use](https://include-what-you-use.org)
 
-			choco install cppcheck -y
-
-	- MacOS:
-
-			brew install cppcheck
-
-	</details>
-
-
-  * [include-what-you-use](https://include-what-you-use.org/)
-	<details>
-	<summary>Install Command</summary>
-
-	Follow instructions here:
-	https://github.com/include-what-you-use/include-what-you-use#how-to-install
-	</details>
+  Follow instructions [here](https://github.com/include-what-you-use/include-what-you-use#how-to-install)
