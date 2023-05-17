@@ -1,6 +1,6 @@
 # Docker Instructions
 
-If you have [Docker](https://www.docker.com/) installed, you can run this
+If you have [Docker](https://www.docker.com) installed, you can run this
 in your terminal, when the Dockerfile is inside the `.devcontainer` directory:
 
 ```shell
@@ -9,7 +9,7 @@ docker run -it my_project:latest
 ```
 
 This command will put you in a `bash` session in a Ubuntu 20.04 Docker container,
-with all of the tools listed in the [Dependencies](#dependencies) section already installed.
+with all of the tools listed in the [Dependencies](README_dependencies.md#dependencies) section already installed.
 Additionally, you will have `g++-11` and `clang++-13` installed as the default
 versions of `g++` and `clang++`.
 
@@ -33,7 +33,7 @@ You will be in a directory that contains a copy of the `cpp_starter_project`;
 any changes you make to your local copy will not be updated in the Docker image
 until you rebuild it.
 If you need to mount your local copy directly in the Docker image, see
-[Docker volumes docs](https://docs.docker.com/storage/volumes/).
+[Docker volumes docs](https://docs.docker.com/storage/volumes).
 TLDR:
 
 ```shell
@@ -42,7 +42,7 @@ docker run -it \
     my_project:latest
 ```
 
-You can configure and build [as directed above](#build) using these commands:
+You can configure and build [as directed above](README_building.md#build-instructions) using these commands:
 
 ```shell
 cd ./starter_project

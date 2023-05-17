@@ -2,7 +2,7 @@
 
 Note about install commands:
 
-- for MacOS, we use [brew](https://brew.sh/)
+- for MacOS, we use [brew](https://brew.sh)
 - for Windows, we use [choco](https://chocolatey.org/install)
 - In case of an error in cmake, make sure that the dependencies are on the PATH
 
@@ -12,7 +12,7 @@ This is a really long list of dependencies, and it's easy to mess up. That's why
 
 - Docker
 
-  We have a Docker image that's already set up for you. See the [Docker instructions](#docker-instructions).
+  We have a Docker image that's already set up for you. See the [Docker instructions](README_docker.md#docker-instructions).
 
 - Setup-cpp
 
@@ -65,7 +65,7 @@ This is a really long list of dependencies, and it's easy to mess up. That's why
       .\install.bat
       ```
 
-  - [GCC 7+](https://gcc.gnu.org/)
+  - [GCC 7+](https://gcc.gnu.org)
 
     - MacOS
 
