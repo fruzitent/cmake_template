@@ -3,13 +3,14 @@
 
 #include <myproject/sample_library_export.hpp>
 
-[[nodiscard]] SAMPLE_LIBRARY_EXPORT int factorial(int) noexcept;
+[[nodiscard]] SAMPLE_LIBRARY_EXPORT auto factorial(int) noexcept -> int;
 
-[[nodiscard]] constexpr int factorial_constexpr(int input) noexcept
-{
-  if (input == 0) { return 1; }
+[[nodiscard]] constexpr auto factorial_constexpr(int input) noexcept -> int { // NOLINT(misc-no-recursion)
+    if (input == 0) {
+        return 1;
+    }
 
-  return input * factorial_constexpr(input - 1);
+    return input * factorial_constexpr(input - 1);
 }
 
 #endif
