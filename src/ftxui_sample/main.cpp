@@ -29,7 +29,7 @@ struct GameBoard {
         return strings.at(cur_x).at(cur_y);
     }
 
-    void set(std::size_t cur_x, std::size_t cur_y, bool new_value) {
+    auto set(std::size_t cur_x, std::size_t cur_y, bool new_value) -> void {
         get(cur_x, cur_y) = new_value;
 
         if (new_value) {
@@ -39,7 +39,7 @@ struct GameBoard {
         }
     }
 
-    void visit(auto visitor) {
+    auto visit(auto visitor) -> void {
         for (std::size_t cur_x = 0; cur_x < width; ++cur_x) {
             for (std::size_t cur_y = 0; cur_y < height; ++cur_y) {
                 visitor(cur_x, cur_y, *this);
@@ -61,7 +61,7 @@ struct GameBoard {
         });
     }
 
-    void update_strings() {
+    auto update_strings() -> void {
         for (std::size_t cur_x = 0; cur_x < width; ++cur_x) {
             for (std::size_t cur_y = 0; cur_y < height; ++cur_y) {
                 set(cur_x, cur_y, get(cur_x, cur_y));
@@ -69,11 +69,11 @@ struct GameBoard {
         }
     }
 
-    void toggle(std::size_t cur_x, std::size_t cur_y) {
+    auto toggle(std::size_t cur_x, std::size_t cur_y) -> void {
         set(cur_x, cur_y, !get(cur_x, cur_y));
     }
 
-    void press(std::size_t cur_x, std::size_t cur_y) {
+    auto press(std::size_t cur_x, std::size_t cur_y) -> void {
         ++move_count;
         toggle(cur_x, cur_y);
         if (cur_x > 0) {
@@ -103,7 +103,7 @@ struct GameBoard {
     }
 };
 
-void consequence_game() {
+auto consequence_game() -> void {
     auto screen = ftxui::ScreenInteractive::TerminalOutput();
 
     GameBoard<3, 3> game_board;
@@ -197,7 +197,7 @@ struct Bitmap : ftxui::Node {
         return pixels.at(width_ * cur_y + cur_x);
     }
 
-    void ComputeRequirement() override {
+    auto ComputeRequirement() -> void override {
         requirement_ = ftxui::Requirement{
             .min_x = static_cast<int>(width_),
             .min_y = static_cast<int>(height_ / 2),
@@ -205,7 +205,7 @@ struct Bitmap : ftxui::Node {
         };
     }
 
-    void Render(ftxui::Screen &screen) override {
+    auto Render(ftxui::Screen &screen) -> void override {
         for (std::size_t cur_x = 0; cur_x < width_; ++cur_x) {
             for (std::size_t cur_y = 0; cur_y < height_ / 2; ++cur_y) {
                 auto &pixel =
@@ -238,7 +238,7 @@ struct Bitmap : ftxui::Node {
     std::vector<Color> pixels = std::vector<Color>(width_ * height_, Color{});
 };
 
-void game_iteration_canvas() {
+auto game_iteration_canvas() -> void {
     // this should probably have a `bitmap` helper function that does what cur_you expect
     // similar to the other parts of FTXUI
     auto bm       = std::make_shared<Bitmap>(50, 50); // NOLINT magic numbers
