@@ -227,11 +227,13 @@ WORKDIR ${WORKDIR}
 
 FROM linux-${IMAGE}-base as linux-deps
 
+ARG LINUX_WORKDIR
+
 ENV CPM_SOURCE_CACHE="/var/cache/cpm/"
 
-COPY "./cmake/CPM.cmake"    "./cmake/"
-COPY "./CMakeLists.txt"     "./"
-COPY "./Dependencies.cmake" "./"
+COPY "./cmake/CPM.cmake"    "${LINUX_WORKDIR}./cmake/"
+COPY "./CMakeLists.txt"     "${LINUX_WORKDIR}./"
+COPY "./Dependencies.cmake" "${LINUX_WORKDIR}./"
 
 RUN \
     --mount=type=cache,sharing=private,target=${CPM_SOURCE_CACHE} \
@@ -248,16 +250,18 @@ EOF
 
 FROM linux-deps as linux-builder
 
-COPY "./cmake/"               "./cmake/"
-COPY "./configured_files/"    "./configured_files/"
-COPY "./fuzz_test/"           "./fuzz_test/"
-COPY "./include/"             "./include/"
-COPY "./src/"                 "./src/"
-COPY "./test/"                "./test/"
-COPY "./.clang-tidy"          "./"
-COPY "./.clangd.in"           "./"
-COPY "./CMakePresets.json"    "./"
-COPY "./ProjectOptions.cmake" "./"
+ARG LINUX_WORKDIR
+
+COPY "./cmake/"               "${LINUX_WORKDIR}/cmake/"
+COPY "./configured_files/"    "${LINUX_WORKDIR}/configured_files/"
+COPY "./fuzz_test/"           "${LINUX_WORKDIR}/fuzz_test/"
+COPY "./include/"             "${LINUX_WORKDIR}/include/"
+COPY "./src/"                 "${LINUX_WORKDIR}/src/"
+COPY "./test/"                "${LINUX_WORKDIR}/test/"
+COPY "./.clang-tidy"          "${LINUX_WORKDIR}/"
+COPY "./.clangd.in"           "${LINUX_WORKDIR}/"
+COPY "./CMakePresets.json"    "${LINUX_WORKDIR}/"
+COPY "./ProjectOptions.cmake" "${LINUX_WORKDIR}/"
 
 ENV MAKEFLAGS="-j$(nproc)"
 
