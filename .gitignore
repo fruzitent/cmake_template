@@ -6,6 +6,7 @@ cmake-build-*/
 conan-cache/
 
 # User spesific settings
+.clangd
 CMakeUserPresets.json
 
 # IDE files

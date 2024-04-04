@@ -22,6 +22,9 @@ project(
   HOMEPAGE_URL "%%myurl%%"
   LANGUAGES CXX C)
 
+# @see: https://clang.llvm.org/docs/JSONCompilationDatabase.html
+configure_file(.clangd.in ${CMAKE_SOURCE_DIR}/.clangd @ONLY)
+
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
