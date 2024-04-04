@@ -1,4 +1,5 @@
 # Build directories and binary files
+_artifact/
 build/
 out/
 out/coverage/*

@@ -9,6 +9,7 @@ ARG LINUX_UBUNTU_TAG="24.04"
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ARG LINUX_WORKDIR="/app/"
+ARG LINUX_OUTDIR="/"
 
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                                                                                      #
@@ -175,9 +176,49 @@ ENV MAKEFLAGS="-j$(nproc)"
 RUN \
     --mount=type=cache,sharing=private,target=${CPM_SOURCE_CACHE} \
 <<EOF
-    cmake -B "./out/" -S "./" -D "CMAKE_CATCH_DISCOVER_TESTS_DISCOVERY_MODE:INTERNAL=PRE_TEST"
+    cmake -B "./out/" -S "./" \
+        -D "CMAKE_BUILD_TYPE:STRING=Release" \
+        -D "CMAKE_CATCH_DISCOVER_TESTS_DISCOVERY_MODE:STRING=PRE_TEST" \
+        -D "myproject_PACKAGING_MAINTAINER_MODE:BOOL=ON" \
+        ;
     cmake --build "./out/"
 EOF
+
+# -------------------------------------------------------------------------------------------------------------------- #
+#                                                                                                                      #
+# => [artifact]                                                                                                        #
+#                                                                                                                      #
+# -------------------------------------------------------------------------------------------------------------------- #
+
+FROM scratch as linux-ubuntu-artifact
+
+ARG LINUX_WORKDIR
+ARG LINUX_OUTDIR
+
+COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/src/ftxui_sample/intro"                 "${LINUX_OUTDIR}/out/src/ftxui_sample/"
+COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/src/sample_library/libsample_library.a" "${LINUX_OUTDIR}/out/src/sample_library/"
+COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/test/constexpr_tests"                   "${LINUX_OUTDIR}/out/test/"
+COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/test/relaxed_constexpr_tests"           "${LINUX_OUTDIR}/out/test/"
+COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/test/tests"                             "${LINUX_OUTDIR}/out/test/"
+
+# -------------------------------------------------------------------------------------------------------------------- #
+#                                                                                                                      #
+# => [runner]                                                                                                          #
+#                                                                                                                      #
+# -------------------------------------------------------------------------------------------------------------------- #
+
+FROM ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-runner
+
+ARG LINUX_WORKDIR
+
+COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/src/ftxui_sample/intro" "/usr/local/bin/"
+
+RUN \
+<<EOF
+    intro --version
+EOF
+
+CMD ["intro"]
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

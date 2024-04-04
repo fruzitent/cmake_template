@@ -3,6 +3,17 @@
 set -ex
 
 docker buildx build . \
+    --build-arg "STRATEGY=native" \
     --file "./docker/Dockerfile" \
+    --platform "linux/amd64,linux/arm64" \
     --tag "ghcr.io/cpp-best-practices/cmake_template:latest" \
+    --target "linux-ubuntu-runner" \
+    ;
+
+docker buildx build . \
+    --build-arg "STRATEGY=native" \
+    --file "./docker/Dockerfile" \
+    --output "dest=./_artifact/,type=local" \
+    --platform "linux/amd64,linux/arm64" \
+    --target "linux-ubuntu-artifact" \
     ;
