@@ -84,6 +84,16 @@ RUN \
     esac
 EOF
 
+RUN \
+    --mount=type=cache,sharing=private,target=/var/cache/apt/ \
+    --mount=type=cache,sharing=private,target=/var/lib/apt/ \
+<<EOF
+    apt-get update
+    apt-get -y install --no-install-recommends \
+        "cmake" \
+        ;
+EOF
+
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FROM scratch as dummy
