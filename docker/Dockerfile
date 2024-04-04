@@ -1,9 +1,32 @@
+# @see: https://docs.docker.com/build/building/multi-platform/#strategies
+# - native
+# - qemu
+ARG STRATEGY="qemu"
+
 ARG LINUX_UBUNTU_IMAGE="docker.io/library/ubuntu"
 ARG LINUX_UBUNTU_TAG="24.04"
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FROM ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-base
+# -------------------------------------------------------------------------------------------------------------------- #
+#                                                                                                                      #
+# => [strategy]                                                                                                        #
+#                                                                                                                      #
+# -------------------------------------------------------------------------------------------------------------------- #
+
+FROM --platform=${BUILDPLATFORM} ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-native
+
+FROM ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-qemu
+
+FROM linux-ubuntu-${STRATEGY} as linux-ubuntu-strategy
+
+# -------------------------------------------------------------------------------------------------------------------- #
+#                                                                                                                      #
+# => [base]                                                                                                            #
+#                                                                                                                      #
+# -------------------------------------------------------------------------------------------------------------------- #
+
+FROM linux-ubuntu-strategy as linux-ubuntu-base
 
 SHELL ["/bin/sh", "-ex", "-c"]
 
