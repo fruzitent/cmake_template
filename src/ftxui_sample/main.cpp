@@ -1,14 +1,30 @@
 #include <array>
+#include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <exception>
 #include <functional>
-#include <iostream>
 #include <optional>
-
 #include <random>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
 
+// TODO: https://github.com/CLIUtils/CLI11/issues/816
+// NOLINTNEXTLINE(misc-include-cleaner)
 #include <CLI/CLI.hpp>
-#include <ftxui/component/captured_mouse.hpp>// for ftxui
-#include <ftxui/component/component.hpp>// for Slider
-#include <ftxui/component/screen_interactive.hpp>// for ScreenInteractive
+
+#include <fmt/core.h>
+#include <ftxui/component/component.hpp>
+#include <ftxui/component/screen_interactive.hpp>
+#include <ftxui/dom/elements.hpp>
+#include <ftxui/dom/node.hpp>
+#include <ftxui/dom/requirement.hpp>
+#include <ftxui/screen/color.hpp>
 #include <spdlog/spdlog.h>
 
 #include <lefticus/tools/non_promoting_ints.hpp>
@@ -257,6 +273,8 @@ void game_iteration_canvas()
     case 2:
       small_bm_pixel.B += 11;// NOLINT Magic Number
       break;
+    default:
+      throw std::runtime_error("unreachable");
     }
 
 
@@ -313,6 +331,7 @@ void game_iteration_canvas()
 int main(int argc, const char **argv)
 {
   try {
+    // NOLINTNEXTLINE(misc-include-cleaner)
     CLI::App app{ fmt::format("{} version {}", myproject::cmake::project_name, myproject::cmake::project_version) };
 
     std::optional<std::string> message;
@@ -329,7 +348,7 @@ int main(int argc, const char **argv)
     turn_based->excludes(loop_based);
     loop_based->excludes(turn_based);
 
-
+    // NOLINTNEXTLINE(misc-include-cleaner)
     CLI11_PARSE(app, argc, argv);
 
     if (show_version) {
