@@ -167,7 +167,7 @@ COPY "./ProjectOptions.cmake" "./"
 RUN \
     --mount=type=cache,sharing=private,target=${CPM_SOURCE_CACHE} \
 <<EOF
-    cmake -B "./out/" -S "./"
+    cmake -B "./out/" -S "./" -D "CMAKE_CATCH_DISCOVER_TESTS_DISCOVERY_MODE:INTERNAL=PRE_TEST"
     cmake --build "./out/"
 EOF
 
