@@ -145,6 +145,32 @@ RUN \
     cmake -B "./out/" -S "./"
 EOF
 
+# -------------------------------------------------------------------------------------------------------------------- #
+#                                                                                                                      #
+# => [builder]                                                                                                         #
+#                                                                                                                      #
+# -------------------------------------------------------------------------------------------------------------------- #
+
+FROM linux-ubuntu-deps as linux-ubuntu-builder
+
+COPY "./cmake/"               "./cmake/"
+COPY "./configured_files/"    "./configured_files/"
+COPY "./fuzz_test/"           "./fuzz_test/"
+COPY "./include/"             "./include/"
+COPY "./src/"                 "./src/"
+COPY "./test/"                "./test/"
+COPY "./.clang-tidy"          "./"
+COPY "./.clangd.in"           "./"
+COPY "./CMakePresets.json"    "./"
+COPY "./ProjectOptions.cmake" "./"
+
+RUN \
+    --mount=type=cache,sharing=private,target=${CPM_SOURCE_CACHE} \
+<<EOF
+    cmake -B "./out/" -S "./"
+    cmake --build "./out/"
+EOF
+
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FROM scratch as dummy
