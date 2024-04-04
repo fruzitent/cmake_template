@@ -57,6 +57,7 @@ EOF
 
 FROM linux-ubuntu-base-common as linux-ubuntu-base-amd64
 
+ENV AR="x86_64-linux-gnu-ar"
 ENV AS="x86_64-linux-gnu-as"
 ENV CC="x86_64-linux-gnu-gcc"
 ENV CXX="x86_64-linux-gnu-g++"
@@ -73,9 +74,11 @@ RUN \
         "gcc-x86-64-linux-gnu" \
         "libc6-dev-amd64-cross" \
         ;
-    # TODO: CC does not use AS and LD on x86-64
+    # TODO: https://stackoverflow.com/questions/10173431/cross-gcc-doesnt-search-for-target-as-and-ld-in-path
+    update-alternatives --install "/usr/bin/ar" "ar" "/usr/bin/${AR}" 1
     update-alternatives --install "/usr/bin/as" "as" "/usr/bin/${AS}" 1
     update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/${LD}" 1
+    ${AR} --version
     ${AS} --version
     ${CC} --version
     ${CXX} --version
@@ -84,6 +87,7 @@ EOF
 
 FROM linux-ubuntu-base-common as linux-ubuntu-base-arm64
 
+ENV AR="aarch64-linux-gnu-ar"
 ENV AS="aarch64-linux-gnu-as"
 ENV CC="aarch64-linux-gnu-gcc"
 ENV CXX="aarch64-linux-gnu-g++"
@@ -100,6 +104,7 @@ RUN \
         "gcc-aarch64-linux-gnu" \
         "libc6-dev-arm64-cross" \
         ;
+    ${AR} --version
     ${AS} --version
     ${CC} --version
     ${CXX} --version
@@ -113,8 +118,9 @@ RUN \
     --mount=type=cache,sharing=private,target=/var/lib/apt/ \
 <<EOF
     apt-get update
+    # TODO: pin cmake version until ports.ubuntu.com resolves discrepancy with cmake-data package
     apt-get -y install --no-install-recommends \
-        "cmake" \
+        "cmake=3.28.3-1" \
         "make" \
         "ninja-build" \
         ;
@@ -163,6 +169,8 @@ COPY "./.clang-tidy"          "./"
 COPY "./.clangd.in"           "./"
 COPY "./CMakePresets.json"    "./"
 COPY "./ProjectOptions.cmake" "./"
+
+ENV MAKEFLAGS="-j$(nproc)"
 
 RUN \
     --mount=type=cache,sharing=private,target=${CPM_SOURCE_CACHE} \
