@@ -8,6 +8,8 @@ ARG LINUX_UBUNTU_TAG="24.04"
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+ARG LINUX_WORKDIR="/app/"
+
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                                                                                      #
 # => [strategy]                                                                                                        #
@@ -49,6 +51,7 @@ RUN \
     apt-get update
     apt-get -y install --no-install-recommends \
         "ca-certificates" \
+        "git" \
         ;
 EOF
 
@@ -70,6 +73,9 @@ RUN \
         "gcc-x86-64-linux-gnu" \
         "libc6-dev-amd64-cross" \
         ;
+    # TODO: CC does not use AS and LD on x86-64
+    update-alternatives --install "/usr/bin/as" "as" "/usr/bin/${AS}" 1
+    update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/${LD}" 1
     ${AS} --version
     ${CC} --version
     ${CXX} --version
@@ -112,6 +118,31 @@ RUN \
         "make" \
         "ninja-build" \
         ;
+EOF
+
+ARG LINUX_WORKDIR
+ARG WORKDIR=${LINUX_WORKDIR}
+WORKDIR ${WORKDIR}
+
+# -------------------------------------------------------------------------------------------------------------------- #
+#                                                                                                                      #
+# => [deps]                                                                                                            #
+#                                                                                                                      #
+# -------------------------------------------------------------------------------------------------------------------- #
+
+FROM linux-ubuntu-base as linux-ubuntu-deps
+
+ENV CPM_SOURCE_CACHE="/var/cache/cpm/"
+
+COPY "./cmake/CPM.cmake"    "./cmake/"
+COPY "./CMakeLists.txt"     "./"
+COPY "./Dependencies.cmake" "./"
+
+RUN \
+    --mount=type=cache,sharing=private,target=${CPM_SOURCE_CACHE} \
+<<EOF
+    export CPM_FETCH=1
+    cmake -B "./out/" -S "./"
 EOF
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

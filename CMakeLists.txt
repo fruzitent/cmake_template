@@ -22,19 +22,21 @@ project(
   HOMEPAGE_URL "%%myurl%%"
   LANGUAGES CXX C)
 
+include(Dependencies.cmake)
+myproject_setup_dependencies()
+
+if($ENV{CPM_FETCH})
+  return()
+endif()
+
 # @see: https://clang.llvm.org/docs/JSONCompilationDatabase.html
 configure_file(.clangd.in ${CMAKE_SOURCE_DIR}/.clangd @ONLY)
 
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
-
 myproject_setup_options()
-
 myproject_global_options()
-include(Dependencies.cmake)
-myproject_setup_dependencies()
-
 myproject_local_options()
 
 # don't know if this should be set globally from here or not...
