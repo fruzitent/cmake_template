@@ -26,7 +26,7 @@ FROM linux-ubuntu-${STRATEGY} as linux-ubuntu-strategy
 #                                                                                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 
-FROM linux-ubuntu-strategy as linux-ubuntu-base
+FROM linux-ubuntu-strategy as linux-ubuntu-base-common
 
 SHELL ["/bin/sh", "-ex", "-c"]
 
@@ -41,7 +41,6 @@ RUN \
 EOF
 
 ARG DEBIAN_FRONTEND="noninteractive"
-ARG TARGETARCH
 
 RUN \
     --mount=type=cache,sharing=private,target=/var/cache/apt/ \
@@ -53,36 +52,55 @@ RUN \
         ;
 EOF
 
+FROM linux-ubuntu-base-common as linux-ubuntu-base-amd64
+
+ENV AS="x86_64-linux-gnu-as"
+ENV CC="x86_64-linux-gnu-gcc"
+ENV CXX="x86_64-linux-gnu-g++"
+ENV LD="x86_64-linux-gnu-ld"
+
 RUN \
     --mount=type=cache,sharing=private,target=/var/cache/apt/ \
     --mount=type=cache,sharing=private,target=/var/lib/apt/ \
 <<EOF
     apt-get update
-    case "${TARGETARCH}" in
-        amd64)
-            apt-get -y install --no-install-recommends \
-                "g++-x86-64-linux-gnu" \
-                "gcc-x86-64-linux-gnu" \
-                "libc6-dev-amd64-cross" \
-                ;
-            x86_64-linux-gnu-g++ --version
-            x86_64-linux-gnu-gcc --version
-            ;;
-        arm64)
-            apt-get -y install --no-install-recommends \
-                "g++-aarch64-linux-gnu" \
-                "gcc-aarch64-linux-gnu" \
-                "libc6-dev-arm64-cross" \
-                ;
-            aarch64-linux-gnu-g++ --version
-            aarch64-linux-gnu-gcc --version
-            ;;
-        *)
-            echo "Unsupported architecture: ${TARGETARCH}"
-            exit 1
-            ;;
-    esac
+    apt-get -y install --no-install-recommends \
+        "binutils-x86-64-linux-gnu" \
+        "g++-x86-64-linux-gnu" \
+        "gcc-x86-64-linux-gnu" \
+        "libc6-dev-amd64-cross" \
+        ;
+    ${AS} --version
+    ${CC} --version
+    ${CXX} --version
+    ${LD} --version
 EOF
+
+FROM linux-ubuntu-base-common as linux-ubuntu-base-arm64
+
+ENV AS="aarch64-linux-gnu-as"
+ENV CC="aarch64-linux-gnu-gcc"
+ENV CXX="aarch64-linux-gnu-g++"
+ENV LD="aarch64-linux-gnu-ld"
+
+RUN \
+    --mount=type=cache,sharing=private,target=/var/cache/apt/ \
+    --mount=type=cache,sharing=private,target=/var/lib/apt/ \
+<<EOF
+    apt-get update
+    apt-get -y install --no-install-recommends \
+        "binutils-aarch64-linux-gnu" \
+        "g++-aarch64-linux-gnu" \
+        "gcc-aarch64-linux-gnu" \
+        "libc6-dev-arm64-cross" \
+        ;
+    ${AS} --version
+    ${CC} --version
+    ${CXX} --version
+    ${LD} --version
+EOF
+
+FROM linux-ubuntu-base-${TARGETARCH} as linux-ubuntu-base
 
 RUN \
     --mount=type=cache,sharing=private,target=/var/cache/apt/ \
