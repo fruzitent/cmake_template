@@ -66,6 +66,30 @@ RUN \
         ;
 EOF
 
+ENV AR="ar"
+ENV AS="as"
+ENV CC="gcc"
+ENV CXX="g++"
+ENV LD="ld"
+
+RUN \
+    --mount=type=cache,sharing=private,target=/var/cache/apk/ \
+    --mount=type=cache,sharing=private,target=/var/lib/apk/ \
+<<EOF
+    apk update
+    apk add \
+        "binutils" \
+        "g++" \
+        "gcc" \
+        "musl-dev" \
+        ;
+    ${AR} --version
+    ${AS} --version
+    ${CC} --version
+    ${CXX} --version
+    ${LD} --version
+EOF
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 FROM linux-ubuntu-strategy as linux-ubuntu-base-common
