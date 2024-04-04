@@ -125,6 +125,9 @@ RUN \
         "make" \
         "ninja-build" \
         ;
+    cmake --version
+    make --version
+    ninja --version
 EOF
 
 ARG LINUX_WORKDIR
