@@ -1,0 +1,5 @@
+{
+  "$help": "https://code.visualstudio.com/docs/getstarted/settings#_default-settings",
+  "cmake.configureOnOpen": true,
+  "editor.formatOnSave": true
+}
