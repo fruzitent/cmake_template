@@ -41,6 +41,7 @@ RUN \
 EOF
 
 ARG DEBIAN_FRONTEND="noninteractive"
+ARG TARGETARCH
 
 RUN \
     --mount=type=cache,sharing=private,target=/var/cache/apt/ \
@@ -50,6 +51,37 @@ RUN \
     apt-get -y install --no-install-recommends \
         "ca-certificates" \
         ;
+EOF
+
+RUN \
+    --mount=type=cache,sharing=private,target=/var/cache/apt/ \
+    --mount=type=cache,sharing=private,target=/var/lib/apt/ \
+<<EOF
+    apt-get update
+    case "${TARGETARCH}" in
+        amd64)
+            apt-get -y install --no-install-recommends \
+                "g++-x86-64-linux-gnu" \
+                "gcc-x86-64-linux-gnu" \
+                "libc6-dev-amd64-cross" \
+                ;
+            x86_64-linux-gnu-g++ --version
+            x86_64-linux-gnu-gcc --version
+            ;;
+        arm64)
+            apt-get -y install --no-install-recommends \
+                "g++-aarch64-linux-gnu" \
+                "gcc-aarch64-linux-gnu" \
+                "libc6-dev-arm64-cross" \
+                ;
+            aarch64-linux-gnu-g++ --version
+            aarch64-linux-gnu-gcc --version
+            ;;
+        *)
+            echo "Unsupported architecture: ${TARGETARCH}"
+            exit 1
+            ;;
+    esac
 EOF
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
