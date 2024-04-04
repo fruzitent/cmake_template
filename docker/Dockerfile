@@ -54,6 +54,7 @@ RUN \
         "ca-certificates" \
         "git" \
         ;
+    git --version
 EOF
 
 FROM linux-ubuntu-base-common as linux-ubuntu-base-amd64
