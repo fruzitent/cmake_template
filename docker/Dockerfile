@@ -1,11 +1,18 @@
 # @help: https://docs.docker.com/reference/dockerfile
 
-# hadolint global ignore=DL3006,DL3008
+# hadolint global ignore=DL3006,DL3008,DL3018
+
+# - alpine
+# - ubuntu
+ARG IMAGE="ubuntu"
 
 # @see: https://docs.docker.com/build/building/multi-platform/#strategies
 # - native
 # - qemu
 ARG STRATEGY="qemu"
+
+ARG LINUX_ALPINE_IMAGE="docker.io/library/alpine"
+ARG LINUX_ALPINE_TAG="3.19"
 
 ARG LINUX_UBUNTU_IMAGE="docker.io/library/ubuntu"
 ARG LINUX_UBUNTU_TAG="24.04"
@@ -32,6 +39,23 @@ FROM linux-ubuntu-${STRATEGY} as linux-ubuntu-strategy
 # => [base]                                                                                                            #
 #                                                                                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
+
+FROM ${LINUX_ALPINE_IMAGE}:${LINUX_ALPINE_TAG} as linux-alpine-base
+
+SHELL ["/bin/sh", "-ex", "-c"]
+
+RUN \
+    --mount=type=cache,sharing=private,target=/var/cache/apk/ \
+    --mount=type=cache,sharing=private,target=/var/lib/apk/ \
+<<EOF
+    apk update
+    apk add \
+        "ca-certificates" \
+        "git" \
+        ;
+EOF
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 FROM linux-ubuntu-strategy as linux-ubuntu-base-common
 
