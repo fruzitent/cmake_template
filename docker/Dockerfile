@@ -90,6 +90,23 @@ RUN \
     ${LD} --version
 EOF
 
+ENV PATH="/usr/lib/ninja-build/bin/:${PATH}"
+
+RUN \
+    --mount=type=cache,sharing=private,target=/var/cache/apk/ \
+    --mount=type=cache,sharing=private,target=/var/lib/apk/ \
+<<EOF
+    apk update
+    apk add \
+        "cmake" \
+        "make" \
+        "ninja-build" \
+        ;
+    cmake --version
+    make --version
+    ninja --version
+EOF
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 FROM linux-ubuntu-strategy as linux-ubuntu-base-common
