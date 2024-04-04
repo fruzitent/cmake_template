@@ -1,3 +1,7 @@
+# @help: https://docs.docker.com/reference/dockerfile
+
+# hadolint global ignore=DL3006,DL3008
+
 # @see: https://docs.docker.com/build/building/multi-platform/#strategies
 # - native
 # - qemu
