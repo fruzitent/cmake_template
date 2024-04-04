@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -ex
+
+docker buildx build . \
+    --file "./docker/Dockerfile" \
+    --tag "ghcr.io/cpp-best-practices/cmake_template:latest" \
+    ;
