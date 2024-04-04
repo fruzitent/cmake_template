@@ -107,6 +107,10 @@ RUN \
     ninja --version
 EOF
 
+ARG LINUX_WORKDIR
+ARG WORKDIR=${LINUX_WORKDIR}
+WORKDIR ${WORKDIR}
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 FROM linux-ubuntu-strategy as linux-ubuntu-base-common
@@ -221,7 +225,7 @@ WORKDIR ${WORKDIR}
 #                                                                                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 
-FROM linux-ubuntu-base as linux-ubuntu-deps
+FROM linux-${IMAGE}-base as linux-deps
 
 ENV CPM_SOURCE_CACHE="/var/cache/cpm/"
 
@@ -242,7 +246,7 @@ EOF
 #                                                                                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 
-FROM linux-ubuntu-deps as linux-ubuntu-builder
+FROM linux-deps as linux-builder
 
 COPY "./cmake/"               "./cmake/"
 COPY "./configured_files/"    "./configured_files/"
@@ -274,16 +278,16 @@ EOF
 #                                                                                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 
-FROM scratch as linux-ubuntu-artifact
+FROM scratch as linux-artifact
 
 ARG LINUX_WORKDIR
 ARG LINUX_OUTDIR
 
-COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/src/ftxui_sample/intro"                 "${LINUX_OUTDIR}/out/src/ftxui_sample/"
-COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/src/sample_library/libsample_library.a" "${LINUX_OUTDIR}/out/src/sample_library/"
-COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/test/constexpr_tests"                   "${LINUX_OUTDIR}/out/test/"
-COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/test/relaxed_constexpr_tests"           "${LINUX_OUTDIR}/out/test/"
-COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/test/tests"                             "${LINUX_OUTDIR}/out/test/"
+COPY --from=linux-builder "${LINUX_WORKDIR}/out/src/ftxui_sample/intro"                 "${LINUX_OUTDIR}/out/src/ftxui_sample/"
+COPY --from=linux-builder "${LINUX_WORKDIR}/out/src/sample_library/libsample_library.a" "${LINUX_OUTDIR}/out/src/sample_library/"
+COPY --from=linux-builder "${LINUX_WORKDIR}/out/test/constexpr_tests"                   "${LINUX_OUTDIR}/out/test/"
+COPY --from=linux-builder "${LINUX_WORKDIR}/out/test/relaxed_constexpr_tests"           "${LINUX_OUTDIR}/out/test/"
+COPY --from=linux-builder "${LINUX_WORKDIR}/out/test/tests"                             "${LINUX_OUTDIR}/out/test/"
 
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                                                                                      #
@@ -291,11 +295,15 @@ COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/test/tests"              
 #                                                                                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 
+FROM ${LINUX_ALPINE_IMAGE}:${LINUX_ALPINE_TAG} as linux-alpine-runner
+
 FROM ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-runner
+
+FROM linux-${IMAGE}-runner as linux-runner
 
 ARG LINUX_WORKDIR
 
-COPY --from=linux-ubuntu-builder "${LINUX_WORKDIR}/out/src/ftxui_sample/intro" "/usr/local/bin/"
+COPY --from=linux-builder "${LINUX_WORKDIR}/out/src/ftxui_sample/intro" "/usr/local/bin/"
 
 RUN \
 <<EOF
