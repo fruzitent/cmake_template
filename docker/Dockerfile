@@ -28,6 +28,17 @@ ARG LINUX_OUTDIR="/"
 #                                                                                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 
+FROM --platform=${BUILDPLATFORM} ${LINUX_ALPINE_IMAGE}:${LINUX_ALPINE_TAG} as linux-alpine-native
+
+# TODO: unimplemented
+RUN exit 1
+
+FROM ${LINUX_ALPINE_IMAGE}:${LINUX_ALPINE_TAG} as linux-alpine-qemu
+
+FROM linux-alpine-${STRATEGY} as linux-alpine-strategy
+
+# ----------------------------------------------------------------------------------------------------------------------
+
 FROM --platform=${BUILDPLATFORM} ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-native
 
 FROM ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-qemu
@@ -40,7 +51,7 @@ FROM linux-ubuntu-${STRATEGY} as linux-ubuntu-strategy
 #                                                                                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 
-FROM ${LINUX_ALPINE_IMAGE}:${LINUX_ALPINE_TAG} as linux-alpine-base
+FROM linux-alpine-strategy as linux-alpine-base
 
 SHELL ["/bin/sh", "-ex", "-c"]
 
