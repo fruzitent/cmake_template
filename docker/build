@@ -2,37 +2,47 @@
 
 set -ex
 
-docker buildx build . \
-    --build-arg "IMAGE=alpine" \
-    --file "./docker/Dockerfile" \
+artifact() {
+    image="${1}"
+    arch="${2}"
+    mkdir --parent "./_artifact/"
+    ${image} \
+        --output "compression=gzip,dest=./_artifact/linux-${image}-${arch}.tar.gz,type=tar" \
+        --output "dest=./_artifact/linux-${image}-${arch}/,type=local" \
+        --platform "linux/${arch}" \
+        --target "linux-artifact" \
+        ;
+}
+
+alpine() {
+    docker buildx build . \
+        --build-arg "IMAGE=alpine" \
+        --file "./docker/Dockerfile" \
+        "${@}" \
+        ;
+}
+
+alpine \
     --platform "linux/amd64,linux/arm64" \
     --tag "ghcr.io/cpp-best-practices/cmake_template:latest-alpine" \
     --target "linux-runner" \
     ;
+artifact "alpine" "amd64"
+artifact "alpine" "arm64"
 
-docker buildx build . \
-    --build-arg "IMAGE=ubuntu" \
-    --build-arg "STRATEGY=native" \
-    --file "./docker/Dockerfile" \
-    --output "dest=./_artifact/,type=local" \
-    --platform "linux/amd64,linux/arm64" \
-    --target "linux-artifact" \
-    ;
+ubuntu() {
+    docker buildx build . \
+        --build-arg "IMAGE=ubuntu" \
+        --build-arg "STRATEGY=native" \
+        --file "./docker/Dockerfile" \
+        "${@}" \
+        ;
+}
 
-docker buildx build . \
-    --build-arg "IMAGE=ubuntu" \
-    --build-arg "STRATEGY=native" \
-    --file "./docker/Dockerfile" \
+ubuntu \
     --platform "linux/amd64,linux/arm64" \
     --tag "ghcr.io/cpp-best-practices/cmake_template:latest-ubuntu" \
     --target "linux-runner" \
     ;
-
-docker buildx build . \
-    --build-arg "IMAGE=ubuntu" \
-    --build-arg "STRATEGY=native" \
-    --file "./docker/Dockerfile" \
-    --output "dest=./_artifact/,type=local" \
-    --platform "linux/amd64,linux/arm64" \
-    --target "linux-artifact" \
-    ;
+artifact "ubuntu" "amd64"
+artifact "ubuntu" "arm64"

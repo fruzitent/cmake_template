@@ -161,9 +161,9 @@ RUN \
         "libc6-dev-amd64-cross" \
         ;
     # TODO: https://stackoverflow.com/questions/10173431/cross-gcc-doesnt-search-for-target-as-and-ld-in-path
-    update-alternatives --install "/usr/bin/ar" "ar" "/usr/bin/${AR}" 1
-    update-alternatives --install "/usr/bin/as" "as" "/usr/bin/${AS}" 1
-    update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/${LD}" 1
+    update-alternatives --install "/usr/local/bin/ar" "ar" "/usr/bin/${AR}" 1
+    update-alternatives --install "/usr/local/bin/as" "as" "/usr/bin/${AS}" 1
+    update-alternatives --install "/usr/local/bin/ld" "ld" "/usr/bin/${LD}" 1
     ${AR} --version
     ${AS} --version
     ${CC} --version
@@ -301,7 +301,21 @@ COPY --from=linux-builder "${LINUX_WORKDIR}/out/test/tests"                     
 
 FROM ${LINUX_ALPINE_IMAGE}:${LINUX_ALPINE_TAG} as linux-alpine-runner
 
+RUN \
+    --mount=type=cache,sharing=private,target=/var/cache/apk/ \
+    --mount=type=cache,sharing=private,target=/var/lib/apk/ \
+<<EOF
+    apk update
+    apk add \
+        "libstdc++" \
+        ;
+EOF
+
+# ----------------------------------------------------------------------------------------------------------------------
+
 FROM ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-runner
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 FROM linux-${IMAGE}-runner as linux-runner
 
