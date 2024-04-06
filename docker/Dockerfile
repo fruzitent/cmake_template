@@ -49,6 +49,17 @@ FROM ${LINUX_UBUNTU_IMAGE}:${LINUX_UBUNTU_TAG} as linux-ubuntu-qemu
 
 FROM linux-ubuntu-${STRATEGY} as linux-ubuntu-strategy
 
+# ----------------------------------------------------------------------------------------------------------------------
+
+FROM --platform=${BUILDPLATFORM} ${WINDOWS_SERVERCORE_IMAGE}:${WINDOWS_SERVERCORE_TAG} as windows-servercore-native
+
+FROM ${WINDOWS_SERVERCORE_IMAGE}:${WINDOWS_SERVERCORE_TAG} as windows-servercore-qemu
+
+# TODO: unimplemented
+RUN exit /b 1
+
+FROM windows-servercore-${STRATEGY} as windows-servercore-strategy
+
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                                                                                      #
 # => [base]                                                                                                            #
