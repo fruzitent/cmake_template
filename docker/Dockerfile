@@ -270,6 +270,7 @@ RUN \
 
     # @see: https://learn.microsoft.com/visualstudio/install/workload-and-component-ids
     Start-Process -FilePath \"${env:TEMP}\\vs_buildtools.exe\" -Wait -ArgumentList `
+        \"--add\", \"Microsoft.VisualStudio.Component.VC.CMake.Project\", `
         \"--add\", \"Microsoft.VisualStudio.Component.VC.Tools.ARM64\", `
         \"--add\", \"Microsoft.VisualStudio.Component.VC.Tools.x86.x64\", `
         \"--add\", \"Microsoft.VisualStudio.Component.Windows11SDK.22621\", `
@@ -281,6 +282,7 @@ RUN \
     & \"$(Get-CimInstance 'MSFT_VSInstance' -Namespace 'root/cimv2/vs' | Select-Object -ExpandProperty 'InstallLocation')\\Common7\\Tools\\Launch-VsDevShell.ps1\" -SkipAutomaticLocation -Arch ${env:TARGETARCH} -HostArch ${env:BUILDARCH}
 
     cl
+    cmake --version
 EOF
 
 ARG GIT_SHA256="a2377f6e4214f16afa1a5a23d9a291d09a2234bcac67c5aeb36d9cce4b7b4d5b"
