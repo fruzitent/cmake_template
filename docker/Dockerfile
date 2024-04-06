@@ -283,6 +283,30 @@ RUN \
     cl
 EOF
 
+ARG GIT_SHA256="a2377f6e4214f16afa1a5a23d9a291d09a2234bcac67c5aeb36d9cce4b7b4d5b"
+ARG GIT_URI="https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/MinGit-2.44.0-busybox-64-bit.zip"
+
+ENV PATH="C:\Program Files\Git\cmd;${PATH}"
+
+RUN \
+<<EOF
+    [System.Net.WebClient]::new().DownloadFile(${env:GIT_URI}, \"${env:TEMP}\\MinGit.zip\")
+
+    ${hash} = (Get-FileHash -Algorithm SHA256 -Path \"${env:TEMP}\\MinGit.zip\").Hash
+    if (${env:GIT_SHA256} -ne ${hash}) {
+        throw \"hash mismatch: expected ${env:GIT_SHA256}, got ${hash}\"
+    }
+
+    Expand-Archive -DestinationPath \"${env:ProgramFiles}\\Git\" -Path \"${env:TEMP}\\MinGit.zip\"
+    Remove-Item -Force -Path \"${env:TEMP}\\MinGit.zip\"
+
+    Get-ChildItem -Path \"${env:ProgramFiles}\\Git\\etc\\gitconfig\" | ForEach-Object {
+        (Get-Content -Path ${_} | Select-String -NotMatch -Pattern \"path = \") | Set-Content -Path ${_}
+    }
+
+    git --version
+EOF
+
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                                                                                      #
 # => [deps]                                                                                                            #
