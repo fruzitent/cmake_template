@@ -4,18 +4,22 @@
 
 # - alpine
 # - ubuntu
+# - servercore
 ARG IMAGE="ubuntu"
 
 # @see: https://docs.docker.com/build/building/multi-platform/#strategies
 # - native
 # - qemu
-ARG STRATEGY="qemu"
+ARG STRATEGY="native"
 
 ARG LINUX_ALPINE_IMAGE="docker.io/library/alpine"
 ARG LINUX_ALPINE_TAG="3.19"
 
 ARG LINUX_UBUNTU_IMAGE="docker.io/library/ubuntu"
 ARG LINUX_UBUNTU_TAG="24.04"
+
+ARG WINDOWS_SERVERCORE_IMAGE="mcr.microsoft.com/windows/servercore"
+ARG WINDOWS_SERVERCORE_TAG="ltsc2022"
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -218,6 +222,15 @@ EOF
 ARG LINUX_WORKDIR
 ARG WORKDIR=${LINUX_WORKDIR}
 WORKDIR ${WORKDIR}
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+FROM windows-servercore-strategy as windows-servercore-base
+
+SHELL ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-Command", "$ErrorActionPreference = 'Stop';", "$ProgressPreference = 'SilentlyContinue';", "Set-PSDebug -Trace 0;"]
+
+# TODO: https://github.com/moby/buildkit/pull/3158
+ENV PATH="C:\Windows\System32;C:\Windows"
 
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                                                                                      #

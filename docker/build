@@ -17,6 +17,7 @@ artifact() {
 alpine() {
     docker buildx build . \
         --build-arg "IMAGE=alpine" \
+        --build-arg "STRATEGY=qemu" \
         --file "./docker/Dockerfile" \
         "${@}" \
         ;
@@ -33,7 +34,6 @@ artifact "alpine" "arm64"
 ubuntu() {
     docker buildx build . \
         --build-arg "IMAGE=ubuntu" \
-        --build-arg "STRATEGY=native" \
         --file "./docker/Dockerfile" \
         "${@}" \
         ;
