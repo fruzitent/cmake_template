@@ -243,6 +243,46 @@ SHELL ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-Comma
 # TODO: https://github.com/moby/buildkit/pull/3158
 ENV PATH="C:\Windows\System32;C:\Windows"
 
+ARG BUILDARCH
+ARG TARGETARCH
+
+# @see: https://learn.microsoft.com/visualstudio/releases/2022/release-history#fixed-version-bootstrappers
+ARG BUILDTOOLS_SHA256="9271cd86da634e354be6035c6aaaffd7c62e458f39410812fcb3f35f4e57d908"
+ARG BUILDTOOLS_URI="https://download.visualstudio.microsoft.com/download/pr/cf977820-7491-4d7f-bd0f-500597f0ea0c/9271cd86da634e354be6035c6aaaffd7c62e458f39410812fcb3f35f4e57d908/vs_BuildTools.exe"
+
+RUN \
+<<EOF
+    [System.Net.WebClient]::new().DownloadFile(${env:BUILDTOOLS_URI}, \"${env:TEMP}\\vs_buildtools.exe\")
+
+    ${hash} = (Get-FileHash -Algorithm SHA256 -Path \"${env:TEMP}\\vs_buildtools.exe\").Hash
+    if (${env:BUILDTOOLS_SHA256} -ne ${hash}) {
+        throw \"hash mismatch: expected ${env:BUILDTOOLS_SHA256}, got ${hash}\"
+    }
+
+    switch(${env:TARGETARCH}) {
+        \"amd64\" { ${arch} = \"\" }
+        \"arm64\" { ${arch} = \"\" }
+        default { throw \"Unsupported architecture: ${env:TARGETARCH}\" }
+    }
+
+    # TODO: PATH is not setup correctly when only either AMD64 or ARM64 is installed
+    # TODO: https://developercommunity.visualstudio.com/t/vsdevcmd-creates-invalid-ARM64-build-con/10090339
+
+    # @see: https://learn.microsoft.com/visualstudio/install/workload-and-component-ids
+    Start-Process -FilePath \"${env:TEMP}\\vs_buildtools.exe\" -Wait -ArgumentList `
+        \"--add\", \"Microsoft.VisualStudio.Component.VC.Tools.ARM64\", `
+        \"--add\", \"Microsoft.VisualStudio.Component.VC.Tools.x86.x64\", `
+        \"--add\", \"Microsoft.VisualStudio.Component.Windows11SDK.22621\", `
+        \"--quiet\", \"--wait\"
+
+    Remove-Item -Force -Path \"${env:TEMP}\\vs_buildtools.exe\"
+
+    # https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2022#developer-powershell
+    & \"$(Get-CimInstance 'MSFT_VSInstance' -Namespace 'root/cimv2/vs' | Select-Object -ExpandProperty 'InstallLocation')\\Common7\\Tools\\Launch-VsDevShell.ps1\" -SkipAutomaticLocation -Arch ${env:TARGETARCH} -HostArch ${env:BUILDARCH}
+
+    cl
+EOF
+
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                                                                                      #
 # => [deps]                                                                                                            #
